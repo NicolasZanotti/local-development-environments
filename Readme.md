@@ -1,4 +1,4 @@
 # Local Development Environments
 
-* [Node.js](./Node.js/README.md)
-* [WordPress](./WordPress/README.md)
+* [Node.js](./Node.js/Readme.md)
+* [WordPress](./WordPress/Readme.md)
