@@ -1,0 +1,45 @@
+version: "3.7"
+services:
+  db:
+    image: postgres:11
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test
+  admin:
+    depends_on:
+      - db
+    image: dpage/pgadmin4
+    ports:
+      - "3001:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+       - admin_data:/root/.pgadmin
+    restart: unless-stopped
+  mail:
+    image: maildev/maildev
+    ports:
+      - "3002:80"
+  site:
+    image: node:lts-alpine
+    depends_on:
+      - db
+      - mail
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    working_dir: /home/node/app
+    volumes:
+      - .:/home/node/app
+    command: node index.js
+    environment:
+      POSTGRESQL_URL: postgresql://postgres:password@localhost:5432/test?schema=public
+      MAIL_SERVER: mail
+volumes:
+  db_data:
+  admin_data:
