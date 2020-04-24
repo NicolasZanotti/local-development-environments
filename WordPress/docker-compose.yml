@@ -1,0 +1,45 @@
+version: "3.7"
+services:
+  db:
+    image: mysql:5.7 # MySQL, https://www.mysql.com/
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+  admin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin # phpMyAdmin, https://www.phpmyadmin.net/
+    restart: always
+    ports:
+      - "8001:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: password
+  mail:
+    image: mailhog/mailhog # MailHog, https://github.com/mailhog/MailHog
+    restart: always
+    ports:
+      - 1025:1025 # smtp server
+      - 8002:8025 # web ui
+  site:
+    depends_on:
+      - db
+      - mail
+    build: . # WordPress, https://wordpress.org/
+    ports:
+      - "8000:80"
+    restart: on-failure
+    volumes: ["./:/var/www/html"]
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DEBUG: 1
+      XDEBUG_CONFIG: remote_host=host.docker.internal
+volumes:
+  db_data: {} # Necessary for persisting the database
