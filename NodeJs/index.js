@@ -21,7 +21,7 @@ app.context.db = new Client({
 app.context.db.connect();
 
 const router = new Router();
-router.get('/', (ctx) => ctx.body = 'Hello world!');
+router.get('/', (ctx) => ctx.body = { status: 'success', data: env });
 
 router.get('/mail', (ctx) => {
   ctx.transporter.sendMail({
@@ -35,16 +35,16 @@ router.get('/mail', (ctx) => {
 });
 
 router.get('/insert', async (ctx) => {
-  await ctx.db.query(`CREATE TABLE IF NOT EXISTS company (id serial PRIMARY KEY, name VARCHAR (50) UNIQUE NOT NULL)`);
-  const result = await ctx.db.query('INSERT INTO company(name) VALUES($1) RETURNING *', ['Test Company ' + (new Date).toISOString()]);
+  await ctx.db.query(`CREATE TABLE IF NOT EXISTS entry (id serial PRIMARY KEY, name VARCHAR (50) UNIQUE NOT NULL)`);
+  const result = await ctx.db.query('INSERT INTO entry(name) VALUES($1) RETURNING *', ['Entry ' + (new Date).toISOString()]);
   ctx.body = { status: 'success', data: result.rows };
 });
 
 router.get('/read', async (ctx) => {
-  const result = await ctx.db.query('SELECT * from company');
+  const result = await ctx.db.query('SELECT * from entry');
   ctx.body = { status: 'success', data: result.rows };
 });
 
 app.use(router.routes());
 app.listen(env.PORT);
-console.log(`Node.js webapp running at 0.0.0.0:${env.PORT}`);
+console.log(`Node.js running in ${env.NODE_ENV} mode on port ${env.PORT}`);

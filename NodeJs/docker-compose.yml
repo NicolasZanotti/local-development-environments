@@ -36,9 +36,9 @@ services:
     volumes:
       - .:/home/node/app
     command: node index.js
-    env_file: .env
     environment:
       PORT: 3000
+      NODE_ENV: $NODE_ENV
       DB_HOST: db
       DB_PORT: 5432
       DB_ADMIN_PORT: 3001
