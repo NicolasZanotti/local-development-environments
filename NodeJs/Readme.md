@@ -1,6 +1,6 @@
 # Local Node.js Development Environment
 
-This repository contains configuration for the local development of a Node.js website.
+This repository contains configuration for the local development of a Node.js website. Many concepts have been copied over from the [Node Docker Good Defaults repository](https://github.com/BretFisher/node-docker-good-defaults/).
 
 ## Docker
 
@@ -12,10 +12,16 @@ Upon completion, you will be able to access the following pages:
 - Database Admin at [localhost:3001](http://localhost:3001/)
 - Mail at [localhost:3002](http://localhost:3002/)
 
+The Node.js application is running with Nodemon, so any changes to JavaScript files should be reflected without needing to restart the containers.
+
 ## Debugging
 
-TODO
+Node starts with the inspect flag. There is launch configuration for VS Code.
 
 ## Email
 
-TODO
+The mail functionality can be checked by calling the [/mail](http://localhost:3000/mail) endpoint.
+
+## Database
+
+The database functionality can be checked by calling the [/insert](http://localhost:3000/insert) and [/read](http://localhost:3000/read) endpoints.
