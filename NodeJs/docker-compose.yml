@@ -6,9 +6,9 @@ services:
       - db_data:/var/lib/postgresql/data/
     restart: on-failure
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: test
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
   db_admin:
     image: adminer
     depends_on:
@@ -19,7 +19,7 @@ services:
     environment: 
       ADMINER_DEFAULT_SERVER: postgres
       ADMINER_DEFAULT_DB_HOST: db
-      ADMINER_DEFAULT_DB_NAME: test
+      ADMINER_DEFAULT_DB_NAME: $POSTGRES_DB
   mail:
     image: maildev/maildev
     ports:
@@ -36,14 +36,15 @@ services:
     volumes:
       - .:/home/node/app
     command: node index.js
+    env_file: .env
     environment:
       PORT: 3000
       DB_HOST: db
       DB_PORT: 5432
       DB_ADMIN_PORT: 3001
-      DB_USER: postgres
-      DB_PASSWORD: password
-      DB_NAME: test
+      DB_USER: $POSTGRES_USER
+      DB_PASSWORD: $POSTGRES_PASSWORD
+      DB_NAME: $POSTGRES_DB
       MAIL_HOST: mail
       MAIL_PORT: 25
       MAIL_ADMIN_PORT: 3002

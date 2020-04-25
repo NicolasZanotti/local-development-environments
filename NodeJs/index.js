@@ -1,63 +1,50 @@
-const http = require('http');
+const env = process.env;
+const Koa = require('koa');
+const Router = require('@koa/router');
 const nodemailer = require('nodemailer');
 const { Client } = require('pg');
+const app = new Koa();
 
-const env = process.env;
-
-const transporter = nodemailer.createTransport({
+app.context.transporter = nodemailer.createTransport({
   host: env.MAIL_HOST,
   port: env.MAIL_PORT,
   ignoreTLS: true
 });
 
-const client = new Client({
+app.context.db = new Client({
   host: env.DB_HOST,
   database: env.DB_NAME,
   user: env.DB_USER,
   password: env.DB_PASSWORD,
   port: env.DB_PORT,
 });
+app.context.db.connect();
 
-const server = http.createServer(async (request, response) => {
-  let result;
-  console.log(request.url);
-  switch (request.url) {
-    case '/mail':
-      transporter.sendMail({
-        from: 'mail@localhost',
-        to: 'mail@localhost',
-        subject: 'Sent from Nodemailer',
-        text: 'Sent from Nodemailer'
-      })
-      response.writeHead(200, { 'Content-Type': 'text/html' });
-      response.end(`Sent mail. <a href="http://localhost:${env.MAIL_ADMIN_PORT}">Check</a>.`);
-      break;
+const router = new Router();
+router.get('/', (ctx) => ctx.body = 'Hello world!');
 
-    case '/company/create':
-      result = await client.query(`CREATE TABLE IF NOT EXISTS company (
-        id serial PRIMARY KEY,
-        name VARCHAR (50) UNIQUE NOT NULL
-      )`);
-      response.end(JSON.stringify(result));
-      break;
-
-    case '/company/insert':
-      result = await client.query('INSERT INTO company(name) VALUES($1) RETURNING *', ['Test Company']);
-      response.end(JSON.stringify(result));
-      break;
-
-    case '/company':
-      result = await client.query('SELECT * from company');
-      response.end(JSON.stringify(result.rows));
-      break;
-
-    default:
-      response.end("Hello world!");
-      break;
-  }
+router.get('/mail', (ctx) => {
+  ctx.transporter.sendMail({
+    from: 'mail@localhost',
+    to: 'mail@localhost',
+    subject: 'Sent from Nodemailer',
+    text: `Sent from Nodemailer at server time ${(new Date).toISOString()}.`
+  });
+  ctx.type = 'text/html';
+  ctx.body = `<html>Sent mail. <a href="http://localhost:${env.MAIL_ADMIN_PORT}">Check</a>.</html>`;
 });
 
-server.listen(env.PORT, (error) => {
-  if (error) return console.error(error.message);
-  console.log(`Node.js webapp running at 0.0.0.0:${env.PORT}`);
+router.get('/insert', async (ctx) => {
+  await ctx.db.query(`CREATE TABLE IF NOT EXISTS company (id serial PRIMARY KEY, name VARCHAR (50) UNIQUE NOT NULL)`);
+  const result = await ctx.db.query('INSERT INTO company(name) VALUES($1) RETURNING *', ['Test Company ' + (new Date).toISOString()]);
+  ctx.body = { status: 'success', data: result.rows };
 });
+
+router.get('/read', async (ctx) => {
+  const result = await ctx.db.query('SELECT * from company');
+  ctx.body = { status: 'success', data: result.rows };
+});
+
+app.use(router.routes());
+app.listen(env.PORT);
+console.log(`Node.js webapp running at 0.0.0.0:${env.PORT}`);
