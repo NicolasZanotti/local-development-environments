@@ -1,21 +1,22 @@
 const http = require('http');
 const nodemailer = require('nodemailer');
 const { Client } = require('pg');
-const port = process.env.PORT || 3000;
+
+const env = process.env;
 
 const transporter = nodemailer.createTransport({
-  host: 'mail',
-  port: 25,
+  host: env.MAIL_HOST,
+  port: env.MAIL_PORT,
   ignoreTLS: true
 });
 
 const client = new Client({
-  host: 'db',
-  database: 'test',
-  user: 'postgres',
-  password: 'password',
-  port: 5432,
-})
+  host: env.DB_HOST,
+  database: env.DB_NAME,
+  user: env.DB_USER,
+  password: env.DB_PASSWORD,
+  port: env.DB_PORT,
+});
 
 const server = http.createServer(async (request, response) => {
   let result;
@@ -29,11 +30,11 @@ const server = http.createServer(async (request, response) => {
         text: 'Sent from Nodemailer'
       })
       response.writeHead(200, { 'Content-Type': 'text/html' });
-      response.end('Sent mail. Check <a href="http://localhost:3001/">localhost:3001</a>.');
+      response.end(`Sent mail. <a href="http://localhost:${env.MAIL_ADMIN_PORT}">Check</a>.`);
       break;
 
     case '/company/create':
-      result = await client.query(`CREATE TABLE company (
+      result = await client.query(`CREATE TABLE IF NOT EXISTS company (
         id serial PRIMARY KEY,
         name VARCHAR (50) UNIQUE NOT NULL
       )`);
@@ -56,15 +57,7 @@ const server = http.createServer(async (request, response) => {
   }
 });
 
-server.listen(port, (error) => {
+server.listen(env.PORT, (error) => {
   if (error) return console.error(error.message);
-  console.log(`server listening on port ${port}`);
+  console.log(`Node.js webapp running at 0.0.0.0:${env.PORT}`);
 });
-
-(async function run() {
-  await client.connect();
-  const res = await client.query('SELECT * from company');
-  console.log(res.rows);
-  
-  await client.end();
-})();
