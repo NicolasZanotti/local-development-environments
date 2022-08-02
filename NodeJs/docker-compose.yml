@@ -23,7 +23,8 @@ services:
   mail:
     image: maildev/maildev
     ports:
-      - "3002:80"
+      - "1080:1080"
+      - "1025:1025"
   site:
     image: node:lts-alpine
     depends_on:
@@ -47,7 +48,7 @@ services:
       DB_PASSWORD: $POSTGRES_PASSWORD
       DB_NAME: $POSTGRES_DB
       MAIL_HOST: mail
-      MAIL_PORT: 25
-      MAIL_ADMIN_PORT: 3002
+      MAIL_PORT: 1025
+      MAIL_ADMIN_PORT: 1080
 volumes:
   db_data:
