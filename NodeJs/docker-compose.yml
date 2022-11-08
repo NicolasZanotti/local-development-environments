@@ -6,9 +6,9 @@ services:
       - db_data:/var/lib/postgresql/data/
     restart: on-failure
     environment:
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
   db_admin:
     image: adminer
     depends_on:
@@ -19,7 +19,7 @@ services:
     environment: 
       ADMINER_DEFAULT_SERVER: postgres
       ADMINER_DEFAULT_DB_HOST: db
-      ADMINER_DEFAULT_DB_NAME: $POSTGRES_DB
+      ADMINER_DEFAULT_DB_NAME: postgres
   mail:
     image: maildev/maildev
     ports:
@@ -44,9 +44,9 @@ services:
       DB_HOST: db
       DB_PORT: 5432
       DB_ADMIN_PORT: 3001
-      DB_USER: $POSTGRES_USER
-      DB_PASSWORD: $POSTGRES_PASSWORD
-      DB_NAME: $POSTGRES_DB
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: postgres
       MAIL_HOST: mail
       MAIL_PORT: 1025
       MAIL_ADMIN_PORT: 1080

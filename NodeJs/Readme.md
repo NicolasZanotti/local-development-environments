@@ -4,7 +4,7 @@ This repository contains configuration for the local development of a Node.js we
 
 ## Docker
 
-Install [Docker](https://www.docker.com/) locally. If running Windows, switch the Docker configuration to use Linux containers. Then in the project root folder, run `docker-compose up`. This will download and run the containers.
+Install [Docker](https://www.docker.com/) locally. If running Windows, switch the Docker configuration to use Linux containers. Then in the project root folder, run `docker-compose -p "node" up`. This will download and run the containers.
 
 Upon completion, you will be able to access the following pages:
 
