@@ -7,7 +7,7 @@
     "cross-env": "7.0.3",
     "koa": "2.14.2",
     "nodemailer": "6.9.3",
-    "nodemon": "2.0.22",
+    "nodemon": "3.0.1",
     "pg": "8.11.1"
   }
 }
